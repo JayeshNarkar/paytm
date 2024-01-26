@@ -84,14 +84,18 @@ router.put("/", authMiddleware, async (req, res) => {
       message: "Incorrect inputs",
     });
   }
-  const { id } = req.body;
+  const { username } = req.body;
   const { firstName, lastName, password } = req.body;
   try {
-    const response = await UserModel.findByIdAndUpdate(id, {
-      firstName,
-      lastName,
-      password,
-    });
+    const response = await UserModel.findOneAndUpdate(
+      { username },
+      {
+        firstName,
+        lastName,
+        password,
+      },
+      { new: true }
+    );
     res.status(200).json({ message: "updated correctly! " });
   } catch (error) {
     res
