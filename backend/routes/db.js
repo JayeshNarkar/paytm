@@ -3,7 +3,8 @@ const mongo_url = process.env.MONGO_URL;
 mongoose.connect(mongo_url + "paytm");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
-const User = new Schema({
+
+const userSchema = new Schema({
   id: ObjectId,
   username: {
     unique: true,
@@ -25,6 +26,19 @@ const User = new Schema({
   lastName: { type: String, required: true, trim: true, maxLength: 50 },
 });
 
-const UserModel = mongoose.model("User", User);
+const accountSchema = new mongoose.Schema({
+  userId: {
+    type: ObjectId,
+    ref: "User",
+    required: true,
+  },
+  balance: {
+    type: Number,
+    required: true,
+  },
+});
 
-module.exports = { UserModel };
+const Account = mongoose.model("Account", accountSchema);
+const User = mongoose.model("User", userSchema);
+
+module.exports = { Account, User };

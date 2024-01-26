@@ -1,11 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const cors = require("cors");
 const bodyParser = require("body-parser");
-const { UserModel } = require("./db");
+const { User, Account } = require("./db");
 const jwt = require("jsonwebtoken");
 const jwt_secret = process.env.jwt_secret;
-router.use(cors());
 router.use(bodyParser.json());
 const { signupBody, signinBody, updateBody } = require("./zod");
 const { authMiddleware } = require("./middleware");
@@ -18,19 +16,19 @@ router.post("/signup", async (req, res) => {
     });
   }
   const { username, password, firstName, lastName } = req.body;
-  const existingUser = await UserModel.findOne({ username });
+  const existingUser = await User.findOne({ username });
   if (existingUser)
     return res
       .status(400)
       .json({ message: "User with this username already exists" });
-  const user = new UserModel({
+  const newUser = new User({
     username,
     password,
     firstName,
     lastName,
   });
   try {
-    const user = await user.save();
+    const user = await newUser.save();
     const userId = user._id;
     const token = jwt.sign(
       {
@@ -38,6 +36,10 @@ router.post("/signup", async (req, res) => {
       },
       jwt_secret
     );
+    await Account.create({
+      userId,
+      balance: 1 + Math.random() * 10000,
+    });
     res.json({
       message: "User created successfully",
       token: token,
@@ -58,7 +60,7 @@ router.post("/signin", async (req, res) => {
   }
   const { username, password } = req.body;
   try {
-    const user = await UserModel.findOne({ username });
+    const user = await User.findOne({ username });
     if (!user || user.password !== password)
       return res.status(400).json({ error: "Invalid username or password" });
     const userId = user._id;
@@ -87,7 +89,7 @@ router.put("/", authMiddleware, async (req, res) => {
   const { username } = req.body;
   const { firstName, lastName, password } = req.body;
   try {
-    const response = await UserModel.findOneAndUpdate(
+    const response = await User.findOneAndUpdate(
       { username },
       {
         firstName,
@@ -96,7 +98,7 @@ router.put("/", authMiddleware, async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json({ message: "updated correctly! " });
+    res.status(200).json({ message: "updated successfully! " });
   } catch (error) {
     res
       .status(error?.status || 500)
