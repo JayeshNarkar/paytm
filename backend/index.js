@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 const { UserModel } = require("./db");
 app.use(cors());
 app.use(bodyParser.json());
-//create 3 user routes sign in, sign up, Allow user to update their information (firstName, lastName, password).
 
 app.post("/signup", async (req, res) => {
   const { username, password, firstName, lastName } = req.body;
