@@ -7,4 +7,8 @@ const cors = require("cors");
 app.use(cors());
 app.use("/api/v1", rootRouter);
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.listen(3000);

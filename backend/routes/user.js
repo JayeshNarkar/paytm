@@ -79,7 +79,7 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-router.put("/", authMiddleware, async (req, res) => {
+router.put("/update", authMiddleware, async (req, res) => {
   const { success } = updateBody.safeParse(req.body);
   if (!success) {
     return res.status(411).json({
@@ -103,6 +103,22 @@ router.put("/", authMiddleware, async (req, res) => {
     res
       .status(error?.status || 500)
       .json({ message: error.message || "Internal server error" });
+  }
+});
+
+router.get("/", authMiddleware, async (req, res) => {
+  try {
+    if (!req.headers.authorization)
+      return res.status(401).json({ message: "Unauthorized" });
+    if (!req.headers.authorization.startsWith("Bearer "))
+      return res.status(401).json({ message: "Unauthorized" });
+    const token = req.headers.authorization.split(" ")[1];
+    const userId = jwt.verify(token, jwt_secret).userId;
+    const { username } = await User.findById(userId);
+    const { balance } = await Account.findOne({ userId });
+    res.status(200).json({ username, balance });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
