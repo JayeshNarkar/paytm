@@ -8,8 +8,9 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use("/api/v1", rootRouter);
 
-app.get("/api", (req, res) => {
-  res.send("Hello from api!");
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
 });
 
 app.listen(port, () => {
