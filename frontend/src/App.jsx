@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import SignUp from "./components/Signup";
 import SignIn from "./components/Signin";
 import Dashboard from "./components/Dashboard";
@@ -19,6 +19,16 @@ function App() {
       <MainApp />
     </RecoilRoot>
   );
+}
+
+function RedirectToRoot() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate("/");
+  }, [navigate]);
+
+  return null;
 }
 
 function MainApp() {
@@ -42,6 +52,7 @@ function MainApp() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/send/:id" element={<Send />} />
+        <Route path="*" element={<RedirectToRoot />} />
       </Routes>
     </>
   );
