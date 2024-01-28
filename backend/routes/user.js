@@ -36,13 +36,15 @@ router.post("/signup", async (req, res) => {
       },
       jwt_secret
     );
+    const balance = 1 + Math.random() * 10000;
     await Account.create({
       userId,
-      balance: 1 + Math.random() * 10000,
+      balance,
     });
     res.json({
       message: "User created successfully",
       token: token,
+      balance: balance.toFixed(2),
     });
   } catch (error) {
     res.status(error?.status || 500).json({
@@ -70,9 +72,11 @@ router.post("/signin", async (req, res) => {
       },
       jwt_secret
     );
+    const { balance } = await Account.findOne({ userId });
     res.json({
       message: "User signed up successfully",
       token: token,
+      balance: balance.toFixed(2),
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error " + error.message });
@@ -116,7 +120,25 @@ router.get("/", authMiddleware, async (req, res) => {
     const userId = jwt.verify(token, jwt_secret).userId;
     const { username } = await User.findById(userId);
     const { balance } = await Account.findOne({ userId });
-    res.status(200).json({ username, balance });
+    res.status(200).json({ username, balance: balance.toFixed(2) });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/users", authMiddleware, async (req, res) => {
+  try {
+    if (!req.headers.authorization)
+      return res.status(401).json({ message: "Unauthorized" });
+    if (!req.headers.authorization.startsWith("Bearer "))
+      return res.status(401).json({ message: "Unauthorized" });
+    const token = req.headers.authorization.split(" ")[1];
+    const currentUserId = jwt.verify(token, jwt_secret).userId;
+    const users = await User.find(
+      { _id: { $ne: currentUserId } },
+      "username _id firstName lastName"
+    );
+    res.status(200).json({ users });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }

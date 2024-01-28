@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
-import { passwordAtom, usernameAtom } from "../atoms";
+import { balanceAtom, passwordAtom, usernameAtom } from "../atoms";
 import axios from "axios";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { isAuthenticatedAtom } from "../atoms";
-import { redirect } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 
 export default function SignIn() {
+  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] =
     useRecoilState(isAuthenticatedAtom);
   const [username, setUsername] = useRecoilState(usernameAtom);
   const [password, setPassword] = useRecoilState(passwordAtom);
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const setBalance = useSetRecoilState(balanceAtom);
 
   useEffect(() => {
     document.body.style.backgroundColor = "rgb(100, 116, 139)";
@@ -19,6 +21,12 @@ export default function SignIn() {
       document.body.style.backgroundColor = ""; // Reset color on component unmount
     };
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   async function handleFormSubmit(e) {
     e.preventDefault();
@@ -31,7 +39,8 @@ export default function SignIn() {
       console.log(response.data.message);
       localStorage.setItem("token", response.data.token);
       setIsAuthenticated(true);
-      setErrorMessage(null); // Clear any previous error messages
+      setErrorMessage(null);
+      setBalance(response.data.balance);
       redirect("/");
     } catch (error) {
       console.log(error);

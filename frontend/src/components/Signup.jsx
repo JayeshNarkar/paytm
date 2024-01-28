@@ -1,5 +1,6 @@
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import {
+  balanceAtom,
   firstNameAtom,
   isAuthenticatedAtom,
   lastNameAtom,
@@ -8,16 +9,10 @@ import {
 } from "../atoms";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
-  useEffect(() => {
-    document.body.style.backgroundColor = "rgb(100, 116, 139)";
-    return () => {
-      document.body.style.backgroundColor = "";
-    };
-  }, []);
-
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useRecoilState(usernameAtom);
@@ -26,6 +21,19 @@ export default function SignUp() {
   const [lastName, setLastName] = useRecoilState(lastNameAtom);
   const [isAuthenticated, setIsAuthenticated] =
     useRecoilState(isAuthenticatedAtom);
+  const setBalance = useSetRecoilState(balanceAtom);
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = "rgb(100, 116, 139)";
+    return () => {
+      document.body.style.backgroundColor = "";
+    };
+  }, []);
 
   async function handleFormSubmit(e) {
     e.preventDefault();
@@ -40,6 +48,7 @@ export default function SignUp() {
       console.log(response.data.message);
       localStorage.setItem("token", response.data.token);
       setIsAuthenticated(true);
+      setBalance(response.data.balance);
       setErrorMessage(null);
     } catch (error) {
       console.log(error.response.data.message);

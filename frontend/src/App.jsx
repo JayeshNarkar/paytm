@@ -1,12 +1,17 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import SignUp from "./components/Signup";
 import SignIn from "./components/Signin";
 import Dashboard from "./components/Dashboard";
 import Navbar from "./components/Navbar";
 import { RecoilRoot, useRecoilValue, useSetRecoilState } from "recoil";
-import axios from "axios";
-import { balanceAtom, isAuthenticatedAtom, usernameAtom } from "./atoms";
+import {
+  balanceAtom,
+  isAuthenticatedAtom,
+  userProfileSelector,
+  usernameAtom,
+} from "./atoms";
+import { Send } from "./components/send";
 
 function App() {
   return (
@@ -17,28 +22,17 @@ function App() {
 }
 
 function MainApp() {
+  const userProfile = useRecoilValue(userProfileSelector);
+  const isAuthenticated = useRecoilValue(isAuthenticatedAtom);
   const setUsername = useSetRecoilState(usernameAtom);
   const setBalance = useSetRecoilState(balanceAtom);
-  const setIsAuthenticated = useSetRecoilState(isAuthenticatedAtom);
-  const isAuthenticated = useRecoilValue(isAuthenticatedAtom);
+
   useEffect(() => {
-    try {
-      localStorage.getItem("token");
-      async function getProfile() {
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${localStorage.getItem("token")}`;
-        const response = await axios.get("/api/v1/user/");
-        const { username, balance } = response.data;
-        setUsername(username);
-        setBalance(balance);
-        setIsAuthenticated(true);
-      }
-      getProfile();
-    } catch (e) {
-      console.log(e);
+    if (userProfile) {
+      setUsername(userProfile.username);
+      setBalance(userProfile.balance);
     }
-  }, [isAuthenticated]);
+  }, [userProfile]);
 
   return (
     <>
@@ -47,6 +41,7 @@ function MainApp() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/" element={<Dashboard />} />
+        <Route path="/send/:id" element={<Send />} />
       </Routes>
     </>
   );
