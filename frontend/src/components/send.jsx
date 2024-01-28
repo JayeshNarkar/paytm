@@ -51,6 +51,7 @@ export function Send() {
         setErrorMessage(null);
       } catch (error) {
         console.log(error.response.data);
+        setSuccessMessage(null);
         setErrorMessage(error.response.data.message);
       } finally {
         setIsLoading(false);
