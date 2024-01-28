@@ -27,6 +27,9 @@ router.post("/transfer", authMiddleware, async (req, res) => {
 
   try {
     const { amount, to } = req.body;
+    if (amount <= 0) {
+      throw new Error("Amount must be greater than 0");
+    }
     const token = req.headers.authorization.split(" ")[1];
     const from = jwt.verify(token, jwt_secret).userId;
     const fromAccount = await Account.findOne({ userId: from }).session(
