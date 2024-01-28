@@ -24,13 +24,10 @@ export default function SignIn() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/user/signin",
-        {
-          username,
-          password,
-        }
-      );
+      const response = await axios.post("/api/v1/user/signin", {
+        username,
+        password,
+      });
       console.log(response.data.message);
       localStorage.setItem("token", response.data.token);
       setIsAuthenticated(true);
