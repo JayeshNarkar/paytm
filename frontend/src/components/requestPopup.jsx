@@ -29,9 +29,8 @@ export function RequestPopup({ from, amount, id }) {
       setBalance(response.data.balance);
       setSuccessMessage(response.data.message);
       setErrorMessage(null);
-      setTimeout(() => {
-        setShowPopup(false);
-      }, 2000);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setShowPopup(false);
     } catch (error) {
       console.log(error.response.data);
       setSuccessMessage(null);
@@ -70,12 +69,14 @@ export function RequestPopup({ from, amount, id }) {
         <button
           className="bg-green-500 hover:bg-green-700 border-2 border-black rounded-md m-2 p-2"
           onClick={acceptRequestHandler}
+          disabled={isLoading}
         >
           Accept
         </button>
         <button
           className="bg-red-500 hover:bg-red-700 border-2 border-black rounded-md m-2 p-2"
           onClick={denyRequestHandler}
+          disabled={isLoading}
         >
           Deny
         </button>
@@ -83,6 +84,7 @@ export function RequestPopup({ from, amount, id }) {
           <button
             className="text-gray-500 hover:text-gray-700 hover:underline"
             onClick={() => setShowPopup(false)}
+            disabled={isLoading}
           >
             Later
           </button>
