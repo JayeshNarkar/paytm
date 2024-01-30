@@ -96,10 +96,54 @@ router.get("/myRequests", authMiddleware, async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
     const userId = jwt.verify(token, jwt_secret).userId;
-    const requests = await Request.find({ from: userId });
+    const requests = await PaymentRequest.find({ to: userId });
     res.json({ requests });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+router.post("/acceptRequest", authMiddleware, async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const userId = jwt.verify(token, jwt_secret).userId;
+    const { requestId, from } = req.body;
+    const request = await PaymentRequest.findOne({ _id: requestId });
+    if (!request) throw new Error("Request does not exist");
+    if (request.to.toString() !== userId) throw new Error("Unauthorized");
+    const fromAccount = await Account.findOne({
+      userId: from,
+    }).session(session);
+    const toAccount = await Account.findOne({ userId }).session(session);
+    if (!fromAccount) throw new Error("Account does not exist");
+    if (fromAccount.balance < request.amount)
+      throw new Error("Insufficient funds");
+    await Account.updateOne(
+      { userId: request.from },
+      { $inc: { balance: request.amount } }
+    ).session(session);
+    await Account.updateOne(
+      { userId },
+      { $inc: { balance: -request.amount } }
+    ).session(session);
+    await PaymentRequest.updateOne(
+      { _id: requestId },
+      { $set: { status: "accepted" } }
+    ).session(session);
+    await session.commitTransaction();
+    const { balance } = await Account.findOne({ userId });
+    res.json({
+      message: "Request accepted successfully!",
+      balance: balance.toFixed(2),
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    session.endSession();
   }
 });
 

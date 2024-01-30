@@ -39,15 +39,12 @@ export default function SignUp() {
     e.preventDefault();
     try {
       setIsLoading(true);
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/user/signup",
-        {
-          username,
-          password,
-          firstName,
-          lastName,
-        }
-      );
+      const response = await axios.post("/api/v1/user/signup", {
+        username,
+        password,
+        firstName,
+        lastName,
+      });
       console.log(response.data.message);
       localStorage.setItem("token", response.data.token);
       setIsAuthenticated(true);

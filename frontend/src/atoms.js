@@ -20,7 +20,7 @@ export const userProfileSelector = selector({
     }
     try {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      const response = await axios.get("http://localhost:3000/api/v1/user/");
+      const response = await axios.get("/api/v1/user/");
       const { username, balance } = response.data;
       return { username, balance };
     } catch (err) {
@@ -71,7 +71,20 @@ export const usersSelector = selector({
       return [];
     }
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    const response = await axios.get("http://localhost:3000/api/v1/user/users");
+    const response = await axios.get("/api/v1/user/users");
     return response.data.users;
+  },
+});
+
+export const myRequestsSelector = selector({
+  key: "myRequests",
+  get: async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return [];
+    }
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    const response = await axios.get("/api/v1/account/myRequests");
+    return response.data.requests;
   },
 });

@@ -37,13 +37,10 @@ export function SendRequest() {
       console.log("id:", id);
       console.log("amount:", amount);
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/v1/account/sendRequest",
-          {
-            to: id,
-            amount: amount,
-          }
-        );
+        const response = await axios.post("/api/v1/account/sendRequest", {
+          to: id,
+          amount: amount,
+        });
         console.log(response.data);
         setErrorMessage(null);
         setSuccessMessage(response.data.message);

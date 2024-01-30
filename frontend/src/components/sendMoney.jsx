@@ -41,13 +41,10 @@ export function SendMoney() {
       e.preventDefault();
       setIsLoading(true);
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/v1/account/transfer",
-          {
-            to: id,
-            amount: amount,
-          }
-        );
+        const response = await axios.post("/api/v1/account/transfer", {
+          to: id,
+          amount: amount,
+        });
         console.log(response.data);
         setSuccessMessage(response.data.message);
         setErrorMessage(null);

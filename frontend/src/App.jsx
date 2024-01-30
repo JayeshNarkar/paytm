@@ -5,12 +5,7 @@ import SignIn from "./components/Signin";
 import Dashboard from "./components/Dashboard";
 import Navbar from "./components/Navbar";
 import { RecoilRoot, useRecoilValue, useSetRecoilState } from "recoil";
-import {
-  balanceAtom,
-  isAuthenticatedAtom,
-  userProfileSelector,
-  usernameAtom,
-} from "./atoms";
+import { balanceAtom, userProfileSelector, usernameAtom } from "./atoms";
 import { SendMoney } from "./components/sendMoney";
 import { SendRequest } from "./components/sendRequest";
 
@@ -34,7 +29,6 @@ function RedirectToRoot() {
 
 function MainApp() {
   const userProfile = useRecoilValue(userProfileSelector);
-  const isAuthenticated = useRecoilValue(isAuthenticatedAtom);
   const setUsername = useSetRecoilState(usernameAtom);
   const setBalance = useSetRecoilState(balanceAtom);
 
