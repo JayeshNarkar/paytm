@@ -9,13 +9,21 @@ export function BusinessCard({ user }) {
         <h1 className="text-3xl font-bold">{username}</h1>
 
         <Link
-          to={`/send/${_id}`}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          to={`/sendMoney/${_id}`}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2"
         >
           Send Money
         </Link>
       </div>
-      <p>{capitalize(firstName) + " " + capitalize(lastName)}</p>
+      <div className="flex justify-between">
+        <p>{capitalize(firstName) + " " + capitalize(lastName)}</p>
+        <Link
+          to={`/sendRequest/${_id}`}
+          className="bg-gray-500 hover:bg-gray-700 text-black font-bold py-2 px-4 rounded"
+        >
+          Request Money
+        </Link>
+      </div>
     </div>
   );
 }

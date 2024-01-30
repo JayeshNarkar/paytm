@@ -11,7 +11,8 @@ import {
   userProfileSelector,
   usernameAtom,
 } from "./atoms";
-import { Send } from "./components/send";
+import { SendMoney } from "./components/sendMoney";
+import { SendRequest } from "./components/sendRequest";
 
 function App() {
   return (
@@ -51,7 +52,8 @@ function MainApp() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/" element={<Dashboard />} />
-        <Route path="/send/:id" element={<Send />} />
+        <Route path="/sendMoney/:id" element={<SendMoney />} />
+        <Route path="/sendRequest/:id" element={<SendRequest />} />
         <Route path="*" element={<RedirectToRoot />} />
       </Routes>
     </>

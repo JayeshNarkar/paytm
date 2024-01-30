@@ -1,30 +1,25 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { balanceAtom, isAuthenticatedAtom, usersSelector } from "../atoms";
-import { useRecoilState, useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { balanceAtom, usersSelector } from "../atoms";
+import { useRecoilState, useRecoilValue, useRecoilValueLoadable } from "recoil";
 import axios from "axios";
 
-export function Send() {
-  const navigate = useNavigate();
-  const isAuthenticated = useRecoilValue(isAuthenticatedAtom);
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/signin");
-    }
-  }, [isAuthenticated, navigate]);
-  const { id } = useParams();
+export function SendRequest() {
   useEffect(() => {
     document.body.style.backgroundColor = "rgb(139 144 153)";
     return () => {
-      document.body.style.backgroundColor = ""; // Reset color on component unmount
+      document.body.style.backgroundColor = "";
     };
   }, []);
-  if (id === undefined) return <div>Incorrect parameters</div>;
-  const usersLoadable = useRecoilValueLoadable(usersSelector);
-  const [errorMessage, setErrorMessage] = useState(null);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [amount, setAmount] = useState(null);
-  const [balance, setBalance] = useRecoilState(balanceAtom);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  if (id === undefined) navigate("/");
+  const balance = useRecoilValue(balanceAtom);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [amount, setAmount] = useState(undefined);
+  const usersLoadable = useRecoilValueLoadable(usersSelector);
   const [successMessage, setSuccessMessage] = useState(null);
   if (usersLoadable.state === "loading") {
     return <div>Loading...</div>;
@@ -35,22 +30,25 @@ export function Send() {
     const user = users.find((user) => user._id === id);
     if (!user) return <div>User not found</div>;
     const toUser = user.username;
-    console.log(toUser);
+
     async function handleFormSubmit(e) {
       e.preventDefault();
       setIsLoading(true);
+      console.log("id:", id);
+      console.log("amount:", amount);
       try {
-        const response = await axios.post("/api/v1/account/transfer", {
-          to: id,
-          amount: amount,
-        });
-        console.log(response.data.balance);
-        const response2 = await axios.get("/api/v1/account/balance");
-        setBalance(response2.data.balance);
-        setSuccessMessage(response.data.message);
+        const response = await axios.post(
+          "http://localhost:3000/api/v1/account/sendRequest",
+          {
+            to: id,
+            amount: amount,
+          }
+        );
+        console.log(response.data);
         setErrorMessage(null);
+        setSuccessMessage(response.data.message);
       } catch (error) {
-        console.log(error.response.data);
+        console.log(error);
         setSuccessMessage(null);
         setErrorMessage(error.response.data.message);
       } finally {
@@ -70,13 +68,13 @@ export function Send() {
           >
             <div className="mb-4">
               <label className="block mb-2 md:text-2xl font-bold">
-                Send money to <strong>{toUser}</strong>:
+                Request money from <strong>{toUser}</strong>:
               </label>
               <input
                 name="amount"
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                placeholder={"Amount to send"}
+                placeholder={"Amount to Request"}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
               />

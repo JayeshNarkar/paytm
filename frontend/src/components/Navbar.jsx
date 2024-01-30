@@ -10,7 +10,7 @@ function Navbar() {
     <nav className="flex items-center justify-between py-3 bg-gray-800 text-white border-b-2 border-black">
       <Link to="/" className="flex items-center">
         <img
-          src="https://pwebassets.paytm.com/commonwebassets/paytmweb/header/images/logo.svg"
+          src="http://pwebassets.paytm.com/commonwebassets/paytmweb/header/images/logo.svg"
           alt="logo"
           className="h-10 w-auto mr-2"
         />

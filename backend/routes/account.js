@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
-const { Account } = require("./db");
+const { Account, PaymentRequest } = require("./db");
 const { authMiddleware } = require("./middleware");
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
@@ -66,6 +66,40 @@ router.post("/transfer", authMiddleware, async (req, res) => {
     res.status(500).json({ message: err.message });
   } finally {
     session.endSession();
+  }
+});
+
+router.post("/sendRequest", authMiddleware, async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const userId = jwt.verify(token, jwt_secret).userId;
+    const { to, amount } = req.body;
+    if (amount <= 0) throw new Error("Amount must be greater than 0");
+    if (userId === to) throw new Error("Cannot request to self");
+    const account = await Account.findOne({ userId: to });
+    if (!account) throw new Error("Account does not exist");
+    if (account.balance < amount)
+      throw new Error("They have insufficient funds!");
+    const newRequest = new PaymentRequest({
+      from: userId,
+      to,
+      amount,
+    });
+    const request = await newRequest.save();
+    res.json({ message: "Request sent successfully!" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/myRequests", authMiddleware, async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const userId = jwt.verify(token, jwt_secret).userId;
+    const requests = await Request.find({ from: userId });
+    res.json({ requests });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

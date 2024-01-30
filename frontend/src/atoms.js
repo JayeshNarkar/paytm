@@ -18,10 +18,16 @@ export const userProfileSelector = selector({
     if (!token) {
       return null;
     }
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    const response = await axios.get("/api/v1/user/");
-    const { username, balance } = response.data;
-    return { username, balance };
+    try {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const response = await axios.get("http://localhost:3000/api/v1/user/");
+      const { username, balance } = response.data;
+      return { username, balance };
+    } catch (err) {
+      localStorage.removeItem("token");
+      console.log(err);
+      return null;
+    }
   },
 });
 
@@ -65,7 +71,7 @@ export const usersSelector = selector({
       return [];
     }
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    const response = await axios.get("/api/v1/user/users");
+    const response = await axios.get("http://localhost:3000/api/v1/user/users");
     return response.data.users;
   },
 });

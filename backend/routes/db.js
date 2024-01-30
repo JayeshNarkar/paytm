@@ -38,7 +38,31 @@ const accountSchema = new mongoose.Schema({
   },
 });
 
+const requestSchema = new mongoose.Schema({
+  from: {
+    type: ObjectId,
+    ref: "User",
+    required: true,
+  },
+  to: {
+    type: ObjectId,
+    ref: "User",
+    required: true,
+  },
+  amount: {
+    type: Number,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
+    required: true,
+  },
+});
+
+const PaymentRequest = mongoose.model("PaymentRequest", requestSchema);
 const Account = mongoose.model("Account", accountSchema);
 const User = mongoose.model("User", userSchema);
 
-module.exports = { Account, User };
+module.exports = { Account, User, PaymentRequest };

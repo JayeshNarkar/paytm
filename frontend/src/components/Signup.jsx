@@ -39,22 +39,26 @@ export default function SignUp() {
     e.preventDefault();
     try {
       setIsLoading(true);
-      const response = await axios.post("/api/v1/user/signup", {
-        username,
-        password,
-        firstName,
-        lastName,
-      });
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/user/signup",
+        {
+          username,
+          password,
+          firstName,
+          lastName,
+        }
+      );
       console.log(response.data.message);
       localStorage.setItem("token", response.data.token);
       setIsAuthenticated(true);
       setBalance(response.data.balance);
       setErrorMessage(null);
     } catch (error) {
-      console.log(error.response.data.message);
-      setErrorMessage(error.response.data.message);
+      console.log(error?.response?.data?.message);
+      setErrorMessage(error.response?.data?.message);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   return (
