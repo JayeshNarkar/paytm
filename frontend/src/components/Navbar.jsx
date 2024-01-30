@@ -1,10 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { isAuthenticatedAtom } from "../atoms";
 
 function Navbar() {
   const isAuthenticated = useRecoilValue(isAuthenticatedAtom);
+  const navigate = useNavigate();
 
   return (
     <nav className="flex items-center justify-between py-3 bg-gray-800 text-white border-b-2 border-black">
@@ -37,6 +38,7 @@ function Navbar() {
             className="bg-sky-400 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded border-2 border-black text"
             onClick={() => {
               localStorage.removeItem("token");
+              navigate("/signin");
               window.location.reload();
             }}
           >
