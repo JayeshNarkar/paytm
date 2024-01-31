@@ -147,4 +147,18 @@ router.post("/acceptRequest", authMiddleware, async (req, res) => {
   }
 });
 
+router.post("/rejectRequest", authMiddleware, async (req, res) => {
+  try {
+    const { requestId } = req.body;
+    if (!requestId) throw new Error("Request ID is required");
+    const request = await PaymentRequest.findOne({ _id: requestId });
+    if (!request) throw new Error("Request does not exist");
+    request.status = "rejected";
+    const response = await request.save();
+    res.json({ message: "Request rejected successfully!" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

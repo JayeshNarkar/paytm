@@ -22,7 +22,6 @@ export default function Dashboard() {
   const pendingRequests = myRequests.filter(
     (request) => request.status === "pending"
   );
-  console.log(myRequests);
 
   return (
     <>

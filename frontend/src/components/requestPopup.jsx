@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Popup from "reactjs-popup";
 import { balanceAtom, usersSelector } from "../atoms";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { capitalize } from "../../basic_functions";
 import axios from "axios";
 
@@ -40,7 +40,24 @@ export function RequestPopup({ from, amount, id }) {
     }
   }
 
-  function denyRequestHandler() {}
+  async function denyRequestHandler() {
+    setIsLoading(true);
+    try {
+      const response = await axios.post("/api/v1/account/rejectRequest", {
+        requestId: id,
+      });
+      console.log(response.data.message);
+      setSuccessMessage(response.data.message);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setShowPopup(false);
+    } catch (error) {
+      console.log(error.response.data);
+      setSuccessMessage(null);
+      setErrorMessage(error.response.data.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Popup
