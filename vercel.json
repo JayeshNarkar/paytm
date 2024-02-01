@@ -22,12 +22,8 @@
     ],
     "rewrites": [
         {
-            "source": "/api/v1/(.*)",
-            "destination": "/api/v1/$1"
-        },
-        {
             "source": "/(.*)",
-            "destination": "/frontend/$1"
+            "destination": "/frontend/index.html"
         }
     ]
 }
