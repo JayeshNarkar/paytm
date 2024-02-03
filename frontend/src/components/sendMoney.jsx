@@ -46,6 +46,8 @@ export function SendMoney() {
           amount: amount,
         });
         console.log(response.data);
+        const balanceResponse = await axios.get("/api/v1/account/balance");
+        setBalance(balanceResponse.data.balance);
         setSuccessMessage(response.data.message);
         setErrorMessage(null);
       } catch (error) {
